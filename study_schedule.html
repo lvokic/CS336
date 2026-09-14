@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CS336 → KV Cache Offloading × CXL 学习计划</title>
+  <style>
+    :root{--bg:#0b1020;--panel:#121a2e;--panel2:#18233c;--text:#eaf0ff;--muted:#9eacc8;--blue:#77a9ff;--cyan:#5eead4;--orange:#ffbd73;--line:#2b3a5c}
+    *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 80% 0,#1c3560 0,#0b1020 42%);color:var(--text);font:15px/1.65 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    .wrap{max-width:1180px;margin:auto;padding:36px 22px 70px}.hero{padding:28px 0 24px}.eyebrow{color:var(--cyan);letter-spacing:.12em;text-transform:uppercase;font-size:12px;font-weight:700}.hero h1{font-size:clamp(30px,5vw,52px);line-height:1.1;max-width:850px;margin:12px 0}.hero p{color:var(--muted);max-width:780px;font-size:17px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}.btn,.tag{border:1px solid var(--line);border-radius:9px;padding:8px 13px;color:var(--text);text-decoration:none;background:#162441}.btn:hover{border-color:var(--blue);color:white}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:18px 0 28px}.card,.week{background:rgba(18,26,46,.88);border:1px solid var(--line);border-radius:14px}.card{padding:18px}.card h3{margin:0 0 5px;color:var(--blue);font-size:14px}.card strong{font-size:25px}.card p{margin:3px 0;color:var(--muted)}.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:22px 0 13px}.toolbar h2{margin:0 15px 0 0;font-size:24px}.filter{background:var(--panel);color:var(--text);border:1px solid var(--line);padding:9px;border-radius:8px}.week{padding:19px 20px;margin:12px 0}.week.done{border-color:var(--cyan);opacity:.72}.week-head{display:flex;justify-content:space-between;gap:14px;align-items:start}.week h3{margin:0;font-size:20px}.week small,.meta{color:var(--muted)}.tag{display:inline-block;padding:2px 8px;font-size:12px;border-radius:999px;background:#1d3152;margin:4px 3px 4px 0}.tag.research{color:var(--orange);border-color:#77582e}.week-body{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:10px}.week ul{margin:7px 0;padding-left:20px}.week li{margin:3px 0}.deliverable{border-left:2px solid var(--cyan);padding-left:14px}.check{display:flex;gap:8px;align-items:center;margin-top:15px;color:var(--muted)}input[type=checkbox]{accent-color:var(--cyan);width:17px;height:17px}footer{margin-top:35px;border-top:1px solid var(--line);padding-top:18px;color:var(--muted);font-size:13px}footer a{color:var(--blue)}
+    @media(max-width:760px){.grid,.week-body{grid-template-columns:1fr}.week-head{display:block}.wrap{padding:24px 14px 50px}}
+  </style>
+</head>
+<body>
+<main class="wrap">
+  <section class="hero">
+    <div class="eyebrow">Research-oriented self study · 24 weeks · 10–12 h/week</div>
+    <h1>CS336 → KV Cache Offloading × CXL</h1>
+    <p>以 Stanford CS336 的“从零构建语言模型”主线为骨架，跳过你已经掌握的深度学习基础复习，把时间集中在 Transformer 系统、推理性能、内存层次、分布式训练和可复现实验上。</p>
+    <div class="actions">
+      <a class="btn" href="https://www.youtube.com/playlist?list=PLoROMvodv4rMqXOcazWaTUHhq-yembLCV" target="_blank">打开你提供的 YouTube Playlist ↗</a>
+      <a class="btn" href="https://cs336.stanford.edu/#schedule" target="_blank">CS336 官方 Schedule ↗</a>
+      <a class="btn" href="https://github.com/stanford-cs336" target="_blank">CS336 GitHub 组织 ↗</a>
+    </div>
+  </section>
+
+  <section class="grid">
+    <div class="card"><h3>每周投入</h3><strong>10–12 h</strong><p>视频 2h · 实现 5–7h · 论文/实验 3h</p></div>
+    <div class="card"><h3>最终产出</h3><strong>1 个系统原型</strong><p>可测量的 KV cache offloading baseline + CXL 设计</p></div>
+    <div class="card"><h3>核心指标</h3><strong>TTFT / TPOT</strong><p>显存、带宽、尾延迟、吞吐、质量损失</p></div>
+  </section>
+
+  <div class="toolbar"><h2>Schedule</h2><select class="filter" id="filter"><option value="all">显示全部</option><option value="course">CS336 主线</option><option value="research">研究方向</option><option value="milestone">里程碑</option></select><span class="meta">勾选状态会自动保存到浏览器</span></div>
+  <section id="schedule">
+    <article class="week" data-kind="course"><div class="week-head"><div><span class="tag">第 1–2 周</span><h3>1. Tokenization & Transformer 基线</h3><small>对应 Lecture 1–4：overview、tokenization、resource accounting、architecture、attention/MoE</small></div></div><div class="week-body"><div><ul><li>观看 playlist 前 4 讲；读 lecture materials。</li><li>完成 A1 的 tokenizer、Transformer、optimizer；先用 TinyStories 跑通。</li><li>复习 KV cache：每层 K/V 的 shape、dtype、随序列长度的线性增长。</li></ul></div><div class="deliverable"><b>产出</b><br>记录 baseline：模型配置、prefill/decode latency、显存峰值、PPL；画出 KV cache memory 公式。</div></div><label class="check"><input type="checkbox"> 本阶段完成</label></article>
+    <article class="week" data-kind="course"><div class="week-head"><div><span class="tag">第 3–4 周</span><h3>2. GPU、Kernel、Triton 与性能测量</h3><small>对应 Lecture 5–6：GPUs/TPUs、kernels、Triton</small></div></div><div class="week-body"><div><ul><li>完成 A1 收尾；观看 Lecture 5–6。</li><li>使用 PyTorch profiler、Nsight Systems/Compute 或等价工具建立测量习惯。</li><li>完成小型 Triton kernel；理解 memory-bound 与 compute-bound。</li></ul></div><div class="deliverable"><b>产出</b><br>建立 benchmark harness：固定 prompt、batch、sequence length，输出 CSV/JSON；避免只报告平均值，加入 P50/P95/P99。</div></div><label class="check"><input type="checkbox"> 本阶段完成</label></article>
+    <article class="week" data-kind="course research"><div class="week-head"><div><span class="tag">第 5–6 周</span><span class="tag research">研究切入点</span><h3>3. Parallelism、Scaling 与 Inference</h3><small>对应 Lecture 7–11：parallelism、scaling laws、inference</small></div></div><div class="week-body"><div><ul><li>完成 A2 的 profiling、FlashAttention/分布式相关部分；观看 Lecture 7–11。</li><li>系统区分 prefill 与 decode：算力需求、内存带宽、KV cache 读写路径。</li><li>学习 continuous batching、paged attention、tensor parallel 对 KV 的影响。</li></ul></div><div class="deliverable"><b>产出</b><br>写 2 页 system note：为什么 decode 阶段会受 KV cache 和 HBM bandwidth 约束？列出 3 个可验证假设。</div></div><label class="check"><input type="checkbox"> 本阶段完成</label></article>
+    <article class="week" data-kind="course"><div class="week-head"><div><span class="tag">第 7–8 周</span><h3>4. Evaluation + CS336 A3 Scaling</h3><small>对应 Lecture 9–12；完成 Assignment 3</small></div></div><div class="week-body"><div><ul><li>完成 scaling-law 实验，理解 compute-optimal 与 extrapolation 的限制。</li><li>为推理系统定义 workload：短/长上下文、不同 batch、不同并发。</li><li>建立 quality harness：固定模型、数据集和解码参数。</li></ul></div><div class="deliverable"><b>产出</b><br>一份 baseline report：吞吐（tokens/s）、TTFT、TPOT、显存占用、PPL/任务准确率和实验配置。</div></div><label class="check"><input type="checkbox"> 本阶段完成</label></article>
+    <article class="week" data-kind="course research"><div class="week-head"><div><span class="tag">第 9–10 周</span><span class="tag research">系统方向</span><h3>5. Data、训练后处理与长上下文</h3><small>对应 Lecture 13–17：data、filtering/dedup、SFT/RL、multimodality</small></div></div><div class="week-body"><div><ul><li>观看剩余 CS336 讲次；A4/A5 选择性完成，优先理解数据和评估流程。</li><li>补充 long-context、RoPE/位置编码、KV cache quantization 的背景。</li><li>开始文献矩阵：方法、offload 层级、调度策略、硬件、指标、限制。</li></ul></div><div class="deliverable"><b>产出</b><br>至少 10 篇论文的表格；明确你的 baseline、对比方法和尚未解决的 gap。</div></div><label class="check"><input type="checkbox"> 本阶段完成</label></article>
+    <article class="week" data-kind="research"><div class="week-head"><div><span class="tag research">第 11–12 周</span><h3>6. KV Cache Offloading 基线实现</h3><small>研究 Sprint 1 · GPU ↔ CPU/NVMe</small></div></div><div class="week-body"><div><ul><li>实现 layer-wise/chunk-wise cache eviction 与恢复；先做同步正确性版本。</li><li>比较 pinned CPU memory、普通 CPU memory、NVMe 的 copy 路径。</li><li>加入异步 prefetch/eviction，记录 overlap、queue depth 和 stall。</li></ul></div><div class="deliverable"><b>产出</b><br>可复现 baseline repo + 一张 Pareto 图：显存节省 vs TPOT/P95 latency vs quality。</div></div><label class="check"><input type="checkbox"> 本阶段完成</label></article>
+    <article class="week" data-kind="research"><div class="week-head"><div><span class="tag research">第 13–14 周</span><h3>7. CXL 内存系统基础</h3><small>研究 Sprint 2 · CXL 2.0/3.0、.cache hierarchy、带宽与延迟</small></div></div><div class="week-body"><div><ul><li>阅读 CXL Consortium 的公开资料，理解 CXL.io、CXL.cache、CXL.mem 与 Type-3 device。</li><li>把 CXL memory 视为 tiered memory：容量、带宽、访问延迟、NUMA/拓扑。</li><li>用 trace/replay 或 simulator 做第一版 latency-bandwidth 模型。</li></ul></div><div class="deliverable"><b>产出</b><br>画出 GPU–HBM–CPU DRAM–CXL memory 的数据路径；给出你的假设和参数来源。</div></div><label class="check"><input type="checkbox"> 本阶段完成</label></article>
+    <article class="week" data-kind="research"><div class="week-head"><div><span class="tag research">第 15–16 周</span><h3>8. 面向 CXL 的 KV Cache 调度器</h3><small>研究 Sprint 3 · locality、prefetch、compression、admission</small></div></div><div class="week-body"><div><ul><li>设计 cache tier policy：hot KV 留在 HBM，warm KV 放 CXL，cold KV 压缩或淘汰。</li><li>对比 FIFO/LRU、attention-score、预测式和 budget-aware 策略。</li><li>加入多请求调度，测试长短请求混合、burst traffic 和高并发。</li></ul></div><div class="deliverable"><b>产出</b><br>一份 design doc：policy、数据结构、并发模型、故障/回退路径和复杂度。</div></div><label class="check"><input type="checkbox"> 本阶段完成</label></article>
+    <article class="week" data-kind="research milestone"><div class="week-head"><div><span class="tag research">第 17–20 周</span><span class="tag">里程碑</span><h3>9. 实验矩阵、消融与论文雏形</h3><small>研究 Sprint 4 · 结果可信度优先</small></div></div><div class="week-body"><div><ul><li>至少 3 个模型规模、3 个上下文长度、3 种并发/批大小。</li><li>消融：无 offload、CPU offload、CXL 模型、量化、prefetch、不同 eviction。</li><li>报告均值与尾延迟，固定随机种子，记录硬件、软件版本和功耗/成本（若可得）。</li></ul></div><div class="deliverable"><b>产出</b><br>6–8 页 workshop-style paper：问题、系统、实验、局限、可复现说明；一次组会式 presentation。</div></div><label class="check"><input type="checkbox"> 本阶段完成</label></article>
+    <article class="week" data-kind="milestone"><div class="week-head"><div><span class="tag">第 21–24 周</span><span class="tag">最终里程碑</span><h3>10. 真实硬件验证与下一步研究计划</h3><small>从模拟假设走向可验证系统</small></div></div><div class="week-body"><div><ul><li>如果能获得 CXL 设备：验证链路带宽、延迟、NUMA 亲和性和并发行为；否则明确 simulator-to-hardware gap。</li><li>复现至少一个公开 baseline，并做端到端长上下文服务测试。</li><li>整理 artifact：代码、配置、数据生成脚本、图表和 README。</li></ul></div><div class="deliverable"><b>最终产出</b><br>可公开的 artifact + 研究 proposal：核心 claim、实验计划、风险、预期贡献和后续 3 个月路线。</div></div><label class="check"><input type="checkbox"> 本阶段完成</label></article>
+  </section>
+  <footer>
+    <p><b>建议节奏：</b>周一/二看 1–2 讲并做笔记；周三至周五实现；周末跑实验、写结论。你已完成 CMU 11-785，因此不必重新系统补深度学习；只在 profiler、GPU memory hierarchy、distributed systems、CXL 语义上定向补课。</p>
+    <p>依据：<a href="https://cs336.stanford.edu/#schedule" target="_blank">Stanford CS336 官方 schedule</a>、<a href="https://www.youtube.com/playlist?list=PLoROMvodv4rMqXOcazWaTUHhq-yembLCV" target="_blank">你提供的 YouTube playlist</a>、<a href="https://github.com/stanford-cs336" target="_blank">CS336 assignments</a>。课程官方强调 Python、PyTorch、GPU/多机优化和 memory hierarchy 是先修能力；本计划据此把研究重点放在 inference systems。</p>
+  </footer>
+</main>
+<script>
+  const boxes=[...document.querySelectorAll('input[type=checkbox]')];
+  boxes.forEach((b,i)=>{const k='cs336-schedule-'+i;b.checked=localStorage.getItem(k)==='1';b.addEventListener('change',()=>{localStorage.setItem(k,b.checked?'1':'0');b.closest('.week').classList.toggle('done',b.checked)}) ;if(b.checked)b.closest('.week').classList.add('done')});
+  document.querySelector('#filter').addEventListener('change',e=>{const v=e.target.value;document.querySelectorAll('.week').forEach(x=>x.style.display=v==='all'||x.dataset.kind.includes(v)?'block':'none')});
+</script>
+</body>
+</html>

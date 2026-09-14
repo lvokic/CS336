@@ -1,0 +1,15 @@
+{
+  "configurations": [
+    {
+      "name": "CS336 BPE (Linux)",
+      "compilerPath": "/usr/bin/c++",
+      "includePath": [
+        "/home/admin/CS336/assignment1-basics/native/src",
+        "/home/admin/CS336/assignment1-basics/.venv/lib/python3.13/site-packages/pybind11/include",
+        "/home/admin/miniforge3/include/python3.13"
+      ],
+      "cppStandard": "c++17"
+    }
+  ],
+  "version": 4
+}

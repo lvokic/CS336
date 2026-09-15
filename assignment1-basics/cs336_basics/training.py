@@ -10,7 +10,7 @@ import numpy as np
 
 from .data import get_batch
 from .nn_utils import cross_entropy, gradient_clipping
-from .optimizer import get_lr_cosine_schedule
+from .optimizer import get_lr_cosine_schedule, get_lr_wsd_schedule
 from .checkpointing import save_checkpoint
 
 
@@ -26,8 +26,11 @@ def train_step(
     model.train()
     optimizer.zero_grad(set_to_none=True)
 
-    logits = model(inputs)
-    loss = cross_entropy(logits.reshape(-1, logits.shape[-1]), targets.reshape(-1))
+    with torch.autocast(
+        device_type="cuda", dtype=torch.bfloat16, enabled=inputs.device.type == "cuda"
+    ):
+        logits = model(inputs)
+        loss = cross_entropy(logits.reshape(-1, logits.shape[-1]), targets.reshape(-1))
     loss.backward()
 
     if max_grad_norm is not None:
@@ -71,6 +74,8 @@ def train(
     optimizer: torch.optim.Optimizer,
     train_dataset,
     *,
+    lr_schedule: str,
+    wsd_decay_start_iters: int | None,
     num_iterations: int,
     batch_size: int,
     context_length: int,
@@ -100,7 +105,9 @@ def train(
     if log_interval <= 0:
         raise ValueError("log_interval must be positive")
     if (eval_interval is None) != (eval_batches == 0):
-        raise ValueError("set both eval_interval and a positive eval_batches, or neither")
+        raise ValueError(
+            "set both eval_interval and a positive eval_batches, or neither"
+        )
     if eval_interval is not None and eval_interval <= 0:
         raise ValueError("eval_interval must be positive")
     if eval_batches < 0:
@@ -112,13 +119,23 @@ def train(
     for local_iteration in range(num_iterations):
         iteration = start_iteration + local_iteration
         completed_iteration = iteration + 1
-        lr = get_lr_cosine_schedule(
-            iteration,
-            max_learning_rate,
-            min_learning_rate,
-            warmup_iters,
-            cosine_cycle_iters,
-        )
+        if lr_schedule == "cosine":
+            lr = get_lr_cosine_schedule(
+                iteration,
+                max_learning_rate,
+                min_learning_rate,
+                warmup_iters,
+                cosine_cycle_iters,
+            )
+        else:
+            lr = get_lr_wsd_schedule(
+                iteration,
+                max_learning_rate,
+                min_learning_rate,
+                warmup_iters,
+                wsd_decay_start_iters,
+                cosine_cycle_iters
+            )
         for group in optimizer.param_groups:
             group["lr"] = lr
         inputs, targets = get_batch(
@@ -131,11 +148,13 @@ def train(
             targets=targets,
             max_grad_norm=max_grad_norm,
         )
-        record = {
-            "iteration": float(completed_iteration),
-            "train_loss": loss.item(),
-            "learning_rate": lr,
-        }
+        should_log = completed_iteration % log_interval == 0
+        if should_log:
+            record = {
+                "iteration": float(completed_iteration),
+                "train_loss": loss.item(),
+                "learning_rate": lr,
+            }
         should_evaluate = (
             valid_dataset is not None
             and eval_interval is not None
@@ -154,7 +173,9 @@ def train(
             if checkpoint_path is not None:
                 checkpoint_target = Path(checkpoint_path)
                 checkpoint_target.parent.mkdir(parents=True, exist_ok=True)
-                save_checkpoint(model, optimizer, completed_iteration, checkpoint_target)
+                save_checkpoint(
+                    model, optimizer, completed_iteration, checkpoint_target
+                )
 
         if completed_iteration % log_interval == 0 or should_evaluate:
             metrics.append(record)

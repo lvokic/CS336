@@ -148,8 +148,27 @@ def get_lr_cosine_schedule(
         if cycle_length == 0:
             return min_learning_rate
         progress = (it - warmup_iters) / cycle_length
-        return min_learning_rate + 0.5 * (
-            1.0 + math.cos(math.pi * progress)
-        ) * (max_learning_rate - min_learning_rate)
+        return min_learning_rate + 0.5 * (1.0 + math.cos(math.pi * progress)) * (
+            max_learning_rate - min_learning_rate
+        )
 
+    return min_learning_rate
+
+
+def get_lr_wsd_schedule(
+    iteration: int,
+    max_learning_rate: float,
+    min_learning_rate: float,
+    warmup_iters: int,
+    decay_start_iters: int,
+    total_iters: int,
+) -> float:
+    if iteration <= warmup_iters:
+        return max_learning_rate * iteration / warmup_iters
+    if iteration <= decay_start_iters:
+        return max_learning_rate
+    if iteration < total_iters:
+        return max_learning_rate - (max_learning_rate - min_learning_rate) * (
+            iteration - decay_start_iters
+        ) / (total_iters - 1 - decay_start_iters)
     return min_learning_rate

@@ -47,6 +47,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--eval-interval", type=int, default=250)
     parser.add_argument("--eval-batches", type=int, default=50)
     parser.add_argument("--log-interval", type=int, default=20)
+    parser.add_argument("--lr-schedule",choices=("cosine", "wsd"),default="cosine")
+    parser.add_argument("--wsd-decay-start-iters",type=int,default=16000)
     parser.add_argument("--resume", type=Path)
     return parser.parse_args()
 
@@ -68,6 +70,7 @@ def main() -> None:
         torch.cuda.manual_seed_all(args.seed)
 
     device = torch.device(args.device)
+    torch.set_float32_matmul_precision("high")
     train_tokens = np.memmap(args.train_tokens, dtype="<u2", mode="r")
     valid_tokens = np.memmap(args.valid_tokens, dtype="<u2", mode="r")
     for name, tokens in (("train", train_tokens), ("valid", valid_tokens)):
@@ -111,6 +114,8 @@ def main() -> None:
         model,
         optimizer,
         train_tokens,
+        lr_schedule=args.lr_schedule,
+        wsd_decay_start_iters=args.wsd_decay_start_iters,
         num_iterations=args.steps - start_iteration,
         batch_size=args.batch_size,
         context_length=args.context_length,

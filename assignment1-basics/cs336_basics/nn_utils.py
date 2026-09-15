@@ -27,10 +27,12 @@ def cross_entropy(inputs: Tensor, targets: Tensor) -> Tensor:
     ``(...)``.  The function should use a log-sum-exp formulation so that
     large logits remain numerically stable.
     """
-    log_probs = inputs - torch.logsumexp(inputs, dim=-1, keepdim=True)
-    return -log_probs[
-        torch.arange(inputs.shape[0], device=inputs.device), targets
-    ].mean()
+    log_normalizer = torch.logsumexp(inputs, dim=-1)
+    correct_logits = inputs[
+        torch.arange(inputs.shape[0], device=inputs.device),
+        targets
+    ]
+    return (log_normalizer - correct_logits).mean()
 
 
 def gradient_clipping(

@@ -9,6 +9,7 @@ dependencies = [
     "einx>=0.4",        # more general tensor operations
     "jaxtyping>=0.3",   # type hints for pytorch/jax/numpy
     "numpy>=2.4",
+    "PySocks>=1.7.1", # SOCKS proxy support for tiktoken downloads in tests
     "psutil>=7",
     "pytest>=9.0",
     "pytest-timeout",

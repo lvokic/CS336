@@ -103,7 +103,7 @@ def generate(
         raise ValueError("max_new_tokens cannot be negative")
     if eos_token_id is not None and eos_token_id < 0:
         raise ValueError("eos_token_id must be non-negative")
-    
+   
     generated = prompt_token_ids
     for _ in range(max_new_tokens):
         context = generated[:, -model.context_length:]

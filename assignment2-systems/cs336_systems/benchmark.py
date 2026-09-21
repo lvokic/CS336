@@ -118,6 +118,23 @@ def benchmark(
     )
 
 
+def memory_profile(step_fn, snapshot_path: str):
+    snapshot = Path(snapshot_path)
+    snapshot.parent.mkdir(parents=True, exist_ok=True)
+
+    for _ in range(5):
+        step_fn()
+    torch.cuda.synchronize()
+
+    torch.cuda.memory._record_memory_history(max_entries=1_000_000)
+    try:
+        step_fn()
+        torch.cuda.synchronize()
+    finally:
+        torch.cuda.memory._dump_snapshot(str(snapshot))
+        torch.cuda.memory._record_memory_history(enabled=None)
+
+
 def profile(
     step_fn: StepFunction,
     *,

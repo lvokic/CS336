@@ -1,4 +1,5 @@
 import gc
+import os
 
 import numpy as np
 import torch
@@ -7,12 +8,19 @@ from torch import Tensor, nn
 from cs336_basics.data import get_batch
 from cs336_basics.model import BasicsTransformerLM
 from cs336_basics.optimizer import AdamW
-from cs336_systems.benchmark import MODEL_CONFIGS, benchmark, get_model_config, profile
+from cs336_systems.benchmark import (
+    MODEL_CONFIGS,
+    benchmark,
+    get_model_config,
+    memory_profile,
+    profile,
+)
 
 MODEL_SIZES = tuple(MODEL_CONFIGS)
 CONTEXT_LENGTHS = (256,)
 MODES = ("forward", "forward-backward", "train-step")
 PROFILE_TARGET = ("small", 256, "forward")
+ENABLE_TORCH_PROFILER = os.getenv("ENABLE_TORCH_PROFILER", "1") == "1"
 
 
 def forward_step(
@@ -75,10 +83,10 @@ def train_step(
 
 def main() -> None:
     device = "cuda"
-    batch_size = 2
+    batch_size = 4
     vocab_size = 10_000
     train_tokens = np.memmap(
-        "../assignment1-basics/data/tinystories_train_tokens.bin",
+        "../assignment1-basics/data/TinyStoriesV2-GPT4-train.bin",
         dtype=np.uint16,
         mode="r",
     )
@@ -99,7 +107,8 @@ def main() -> None:
                 d_ff=config.d_ff,
                 num_layers=config.num_layers,
                 num_heads=config.num_heads,
-            ).to(device)
+            )
+            model = torch.compile(model, fullgraph=True).to(device)
             optimizer = AdamW(model.parameters(), lr=1e-3)
 
             # Data sampling and host-to-device transfer are intentionally outside
